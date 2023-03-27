@@ -1,3 +1,2 @@
-# Parkit_projects
-This is an implementation of license number detection and  recognition model for Parkit project
+##This is the 1st model in our system to detect license plate number, and this model we use it to control entry and exit from the parking
 ![](https://github.com/mohame54/Parkit_projects/blob/main/fig.png)
