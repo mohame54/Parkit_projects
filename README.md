@@ -3,7 +3,7 @@
 
 ![](https://github.com/mohame54/Parkit_projects/blob/main/fig.png)
 
-** to install the requirements**
+**to install the requirements**
 
 > pip install -r requirements.txt
 
