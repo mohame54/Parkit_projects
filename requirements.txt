@@ -1,4 +1,6 @@
-torch torchvision torchaudio
+torch
+torchvision
+torchaudio
 tensorflow
 opencv-python
 numpy
