@@ -3,8 +3,9 @@
 
 ![](https://github.com/mohame54/Parkit_projects/blob/main/fig.png)
 
-**to install the requirements**
+**To install the requirements**
 
 > pip install -r requirements.txt
 
-**try the demo here.** [![Open in colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nX6H0V-cOWR1q8WT-BVnTZWMf1fIgPoL?usp=sharing)
+ [![Open in colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nX6H0V-cOWR1q8WT-BVnTZWMf1fIgPoL?usp=sharing)
+ **Try the demo here.**
