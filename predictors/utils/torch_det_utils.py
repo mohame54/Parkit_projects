@@ -2,7 +2,7 @@ import torchvision
 import torch
 import time
 import numpy as np
-import cv2
+
 
 def xywh2xyxy(x):
     """
@@ -128,7 +128,7 @@ def non_max_suppression(
         boxes, scores = x[:, :4] + c, x[:, 4]  # boxes (offset by class), scores
         i = torchvision.ops.nms(boxes, scores, iou_thres)  # NMS
         i = i[:max_det]  # limit detections
-       
+
         output[xi] = x[i]
         if mps:
             output[xi] = output[xi].to(device)
@@ -136,6 +136,7 @@ def non_max_suppression(
             break  # time limit exceeded
 
     return output
+
 
 def scale_coords(img1_shape, coords, img0_shape, ratio_pad=None):
     # Rescale coords (xyxy) from img1_shape to img0_shape
@@ -169,147 +170,3 @@ def clip_boxes(boxes, shape):
     else:  # np.array (faster grouped)
         boxes[..., [0, 2]] = boxes[..., [0, 2]].clip(0, shape[1])  # x1, x2
         boxes[..., [1, 3]] = boxes[..., [1, 3]].clip(0, shape[0])  # y1, y2
-
-
-
-class LetterBox:
-    """Resize image and padding for detection, instance segmentation, pose"""
-
-    def __init__(self, new_shape=(640, 640), auto=False, scaleFill=False, scaleup=True, stride=32):
-        self.new_shape = new_shape
-        self.auto = auto
-        self.scaleFill = scaleFill
-        self.scaleup = scaleup
-        self.stride = stride
-
-    def __call__(self, labels=None, image=None):
-        if labels is None:
-            labels = {}
-        img = labels.get('img') if image is None else image
-        shape = img.shape[:2]  # current shape [height, width]
-        new_shape = labels.pop('rect_shape', self.new_shape)
-        if isinstance(new_shape, int):
-            new_shape = (new_shape, new_shape)
-
-        # Scale ratio (new / old)
-        r = min(new_shape[0] / shape[0], new_shape[1] / shape[1])
-        if not self.scaleup:  # only scale down, do not scale up (for better val mAP)
-            r = min(r, 1.0)
-
-        # Compute padding
-        ratio = r, r  # width, height ratios
-        new_unpad = int(round(shape[1] * r)), int(round(shape[0] * r))
-        dw, dh = new_shape[1] - new_unpad[0], new_shape[0] - new_unpad[1]  # wh padding
-        if self.auto:  # minimum rectangle
-            dw, dh = np.mod(dw, self.stride), np.mod(dh, self.stride)  # wh padding
-        elif self.scaleFill:  # stretch
-            dw, dh = 0.0, 0.0
-            new_unpad = (new_shape[1], new_shape[0])
-            ratio = new_shape[1] / shape[1], new_shape[0] / shape[0]  # width, height ratios
-
-        dw /= 2  # divide padding into 2 sides
-        dh /= 2
-        if labels.get('ratio_pad'):
-            labels['ratio_pad'] = (labels['ratio_pad'], (dw, dh))  # for evaluation
-
-        if shape[::-1] != new_unpad:  # resize
-            img = cv2.resize(img, new_unpad, interpolation=cv2.INTER_LINEAR)
-        top, bottom = int(round(dh - 0.1)), int(round(dh + 0.1))
-        left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
-        img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT,
-                                 value=(114, 114, 114))  # add border
-
-        if len(labels):
-            labels = self._update_labels(labels, ratio, dw, dh)
-            labels['img'] = img
-            labels['resized_shape'] = new_shape
-            return labels
-        else:
-            return img  
-def preprocess(img):
-  y = img.transpose(2,0,1)
-  y = y.astype(np.float32)/255
-  return y.copy()[None]
-
-def load_preprocess(img_path):
-  img = cv2.imread(img_path)[...,::-1]
-  im = LetterBox()(image=img)
-  im = preprocess(im)
-  return im,img 
-
-
-class Bbox(object):
-    def __init__(self,xmin,ymin,xmax,ymax,conf):
-        self.xmin = xmin
-        self.ymin = ymin
-        self.xmax = xmax
-        self.ymax = ymax
-        self.conf = conf
-    @property    
-    def attrs(self):
-        return [self.xmin,self.ymin,self.xmax,self.ymax]
-
-    def map(self,fn):
-        attrs = list(map(fn,self.attrs))
-        return Bbox(*attrs,conf=self.conf)
-    
-    def __getitem__(self,idxs):
-       attrs = self.attrs+[self.conf]
-       return attrs[idxs]
-    @property
-    def width(self):
-        return self.xmax-self.xmin
-    @property
-    def height(self):
-        return self.ymax-self.ymin
-    @property
-    def area(self):
-        return self.width*self.height
-    @classmethod
-    def from_yolo(cls,item):
-        xc,yc,w,h = item
-        xmin = max(xc-w//2,0)
-        ymin = max(yc-h//2,0)
-        xmax = xc+w//2
-        ymax = yc+h//2
-        return cls(xmin,)
-    
-    @classmethod
-    def from_array_tensor(cls,item): # bbox from prediction after nms
-        items = []
-        if isinstance(item,torch.Tensor):
-            item = item.cpu().numpy()
-        if len(item.shape)>1:
-            item = item[:,:-1]
-            for it in item:
-                attrs = it[:4].astype(int).tolist()
-                conf = float(it[4])
-                items.append(cls(*attrs,conf=conf))
-            return items    
-
-        else:
-            item = item[:-1]
-            attrs = item[:4].astype(int).tolist()
-            conf = float(item[4])
-            return cls(*attrs,conf=conf)
-
-    def __str__(self) -> str:
-        return f"xmin:{self.xmin}, ymin:{self.ymin}, xmax:{self.xmax}, ymax:{self.ymax}, conf:{self.conf:.3f}"
-    def __repr__(self) -> str:
-        return f"xmin:{self.xmin}, ymin:{self.ymin}, xmax:{self.xmax}, ymax:{self.ymax}, conf:{self.conf:.3f}"
-    
-    def __add__(self,other):
-        xmin = min(self.xmin,other.xmin)
-        ymin = min(self.ymin,other.ymin)
-        xmax = max(self.xmax,other.xmax)
-        ymax = max(self.ymax,other.ymax)
-        return Bbox(xmin,ymin,xmax,ymax,self.conf)
-    
-    def __sub__(self,other):
-        xmin = max(self.xmin,other.xmin)
-        ymin = max(self.ymin,other.ymin)
-        xmax = min(self.xmax,other.xmax)
-        ymax = min(self.ymax,other.ymax)
-        return Bbox(xmin,ymin,xmax,ymax,self.conf)
-            
-
