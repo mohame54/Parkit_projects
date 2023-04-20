@@ -3,10 +3,11 @@
 **This repo includes two predictors in `predictors module` one for `car detection` and the other is for `license plate detection and recognition`.**
 
 **The car detection phase**
-![](https://github.com/mohame54/Parkit_projects/blob/main/imgs/test.gif)
+![](https://github.com/mohame54/Parkit_projects/blob/main/imgs/test2.gif)
 
 
 **The license plate recognition**
+
 ![](https://github.com/mohame54/Parkit_projects/blob/main/imgs/fig.png)
 
 **To install the requirements**
