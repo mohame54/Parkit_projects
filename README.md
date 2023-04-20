@@ -15,5 +15,5 @@
 
 > pip install -r requirements.txt
 
- [![Open in colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1nX6H0V-cOWR1q8WT-BVnTZWMf1fIgPoL?usp=sharing)
+ [![Open in colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/17WDs4i8l62YdPRoQnN1PybBexpv14Lqy?usp=sharing)
  **Try the demo here.**
