@@ -1,5 +1,5 @@
 # Parkit project  
-8
+
 **This repo is for car license plate detection and recognition using a custom trained ocr model and fine-tuned YOLOV8 object detection model.**
 
 **The car detection phase**
