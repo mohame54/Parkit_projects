@@ -1,6 +1,6 @@
 # Parkit project  
-
-**This repo includes two predictors in `predictors module` one for `car detection` and the other is for `license plate detection and recognition`.**
+8
+**This repo is for car license plate detection and recognition using a custom trained ocr model and fine-tuned YOLOV8 object detection model.**
 
 **The car detection phase**
 
