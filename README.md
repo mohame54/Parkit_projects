@@ -1,7 +1,7 @@
 # Parkit project  
 
 **This repo is for Egyptian car license plate detection and recognitior project using a custom trained ocr model using Tensorflow and a fine-tuned YOLOV8 object detection model. using Pytorch**
-**Also there are some utils to convert these models  to TfLite for faster inference on Edge devices**
+**,also there are some utils to convert these models  to TfLite for faster inference on Edge devices**
 
 
 **The car detection phase**
